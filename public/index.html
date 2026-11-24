@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flora ID – Kenali tanaman dari foto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#eef3ee;--surface:#fff;--ink:#14281f;--muted:#53665c;--line:#cfdad2;--brand:#1f6b4a;--brand-ink:#fff;--accent:#d9ec8a;--warn:#b4531f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b15;--surface:#16271f;--ink:#e6f0e9;--muted:#9bb0a3;--line:#2a4034;--brand:#6fcf9b;--brand-ink:#0b1a12;--accent:#3d5a1f;--warn:#e89463}}
+:root[data-theme="dark"]{--bg:#0f1b15;--surface:#16271f;--ink:#e6f0e9;--muted:#9bb0a3;--line:#2a4034;--brand:#6fcf9b;--brand-ink:#0b1a12;--accent:#3d5a1f;--warn:#e89463}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Instrument Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;line-height:1.1;margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);background:var(--bg)}
+nav{display:flex;align-items:center;gap:20px;height:60px}
+.logo{font:800 1.25rem "Bricolage Grotesque",sans-serif;text-decoration:none;margin-right:auto}
+nav a.l{text-decoration:none;color:var(--muted);font-weight:500}
+nav a.l:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:12px 20px;font:600 1rem "Instrument Sans",sans-serif;background:var(--brand);color:var(--brand-ink);cursor:pointer;text-decoration:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.hero{padding:48px 0 40px;display:grid;gap:28px}
+.hero h1{font-size:clamp(2.2rem,6vw,4rem);font-weight:800;max-width:14ch}
+.hero p.lead{font-size:1.15rem;color:var(--muted);max-width:52ch;margin:14px 0 0}
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px}
+.tool-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.tool label.f{font-weight:600;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+select{font:inherit;padding:9px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.slot{aspect-ratio:1;border:2px dashed var(--line);border-radius:14px;position:relative;overflow:hidden;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:.9rem;background:var(--bg)}
+.slot.on{border-style:solid;border-color:var(--brand)}
+.slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slot .x{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;cursor:pointer;font-size:16px;line-height:1}
+.slot select{position:absolute;left:6px;right:6px;bottom:6px;font-size:.8rem;padding:4px 6px}
+.drop{margin-top:14px;border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;cursor:pointer;color:var(--muted);transition:background .15s,border-color .15s}
+.drop.over{background:var(--accent);border-color:var(--brand);color:var(--ink)}
+.drop strong{color:var(--ink)}
+.actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+.note{font-size:.88rem;color:var(--muted)}
+#res{margin-top:20px;display:none}
+#res h3{font-size:1.3rem;margin-bottom:6px}
+.demo{display:inline-block;background:var(--accent);color:var(--ink);border-radius:6px;padding:2px 8px;font-size:.82rem;font-weight:600;margin-bottom:10px}
+.r{display:grid;grid-template-columns:1fr 64px;gap:4px 12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.r em{font-style:italic;font-weight:600}
+.r small{color:var(--muted);grid-column:1/2}
+.bar{grid-column:1/3;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:99px;width:0;transition:width .7s ease}
+.r b{text-align:right}
+section.s{padding:44px 0;border-top:1px solid var(--line)}
+section.s h2{font-size:clamp(1.6rem,4vw,2.3rem);margin-bottom:10px;max-width:22ch}
+section.s p.sub{color:var(--muted);max-width:60ch;margin:0 0 24px}
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+.feat div{padding:22px;border-right:1px solid var(--line)}
+.feat div:last-child{border-right:0}
+.feat h3{font-size:1.2rem;margin-bottom:6px}
+.feat p{margin:0 0 12px;color:var(--muted)}
+.feat span{font:600 1.7rem "Bricolage Grotesque",sans-serif;color:var(--brand)}
+.band{background:var(--brand);color:var(--brand-ink);border-radius:18px;padding:30px;display:grid;gap:12px}
+.band h2{max-width:none!important}
+.band p{margin:0;opacity:.9;max-width:56ch}
+.band .btn{background:var(--brand-ink);color:var(--brand);width:fit-content}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.two .tool h3{margin-bottom:6px}
+.two .tool p{margin:0 0 14px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:30px 0 40px;color:var(--muted);font-size:.92rem}
+footer .cols{display:flex;gap:30px;flex-wrap:wrap;justify-content:space-between}
+footer ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
+@media (max-width:760px){
+ nav a.l{display:none}
+ .slots{grid-template-columns:repeat(2,1fr)}
+ .feat{grid-template-columns:1fr}
+ .feat div{border-right:0;border-bottom:1px solid var(--line)}
+ .feat div:last-child{border-bottom:0}
+ .two{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><nav>
+ <a class="logo" href="#">Flora ID</a>
+ <a class="l" href="#identify">Identifikasi</a>
+ <a class="l" href="#jelajah">Jelajah</a>
+ <a class="l" href="#penyakit">Penyakit</a>
+ <a class="btn ghost" href="#masuk">Masuk</a>
+</nav></div></header>
+
+<main class="wrap">
+<div class="hero" id="identify">
+ <div>
+  <h1>Foto tanamannya, kenali namanya.</h1>
+  <p class="lead">Unggah sampai 4 foto dari satu tanaman—daun, bunga, buah, atau batang—lalu lihat kemungkinan spesiesnya.</p>
+ </div>
+
+ <div class="tool">
+  <div class="tool-top">
+   <label class="f" for="flora">Pilih flora
+    <select id="flora"><option value="all">Flora dunia</option></select>
+   </label>
+   <span class="note" id="count">0 dari 4 foto</span>
+  </div>
+  <div class="slots" id="slots"></div>
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Pilih atau jatuhkan foto">
+   <strong>Pilih foto</strong> atau seret ke sini
+   <input type="file" id="file" accept="image/*" multiple hidden>
+  </div>
+  <div class="actions">
+   <button class="btn" id="go" disabled>Identifikasi tanaman</button>
+   <button class="btn ghost" id="reset" type="button">Hapus semua</button>
+   <span class="note">Tip: foto dekat dan terang memberi hasil lebih akurat.</span>
+  </div>
+  <div id="res" aria-live="polite"></div>
+ </div>
+</div>
+
+<section class="s" id="jelajah">
+ <h2>Jelajahi tanaman dari berbagai wilayah</h2>
+ <p class="sub">Setiap flora memuat daftar spesies yang tumbuh di wilayahnya, jadi hasil identifikasi lebih relevan.</p>
+ <div class="feat">
+  <div><span>70.000+</span><h3>Spesies</h3><p>Katalog dengan foto, famili, dan nama umum.</p><a href="#">Lihat spesies</a></div>
+  <div><span>Peta</span><h3>Observasi</h3><p>Temuan pengguna lain, lengkap dengan lokasi dan tanggal.</p><a href="#">Buka peta</a></div>
+  <div><span>Grup</span><h3>Komunitas</h3><p>Gabung grup dengan minat yang sama dan bagikan temuanmu.</p><a href="#">Cari grup</a></div>
+ </div>
+</section>
+
+<section class="s" id="penyakit">
+ <div class="band">
+  <h2>Daunnya bercak atau layu?</h2>
+  <p>Unggah foto bagian tanaman yang bermasalah untuk menebak penyakit atau hama penyebabnya.</p>
+  <a class="btn" href="#">Identifikasi penyakit atau hama</a>
+ </div>
+</section>
+
+<section class="s" id="masuk">
+ <div class="two">
+  <div class="tool"><h3>Simpan temuanmu</h3><p>Daftar untuk menyimpan observasi, menandai lokasi, dan membagikannya ke komunitas.</p><a class="btn" href="#">Daftar gratis</a></div>
+  <div class="tool"><h3>Bantu memvalidasi</h3><p>Punya ilmu botani? Setujui atau koreksi identifikasi dari pengguna lain.</p><a class="btn ghost" href="#">Mulai mengkurasi</a></div>
+ </div>
+</section>
+</main>
+
+<footer><div class="wrap"><div class="cols">
+ <div><strong>Flora ID</strong><br>Identifikasi tanaman dari foto.</div>
+ <div><strong>Sumber daya</strong><ul><li><a href="#">Dokumentasi</a></li><li><a href="#">API</a></li><li><a href="#">Data terbuka</a></li></ul></div>
+ <div><strong>Legal</strong><ul><li><a href="#">Ketentuan penggunaan</a></li><li><a href="#">Kebijakan privasi</a></li></ul></div>
+</div></div></footer>
+
+<script>
+(function(){
+ var MAX=4, items=[];
+ var slots=document.getElementById('slots'), drop=document.getElementById('drop'),
+     file=document.getElementById('file'), go=document.getElementById('go'),
+     res=document.getElementById('res'), count=document.getElementById('count'),
+     flora=document.getElementById('flora');
+ var ORGANS=['Daun','Bunga','Buah','Batang'];
+ function render(){
+  slots.innerHTML='';
+  for(var i=0;i<MAX;i++){
+   var d=document.createElement('div'); d.className='slot';
+   var it=items[i];
+   if(it){
+    d.className+=' on';
+    var im=document.createElement('img'); im.src=it.url; im.alt='Foto '+(i+1); d.appendChild(im);
+    var x=document.createElement('button'); x.className='x'; x.type='button'; x.setAttribute('aria-label','Hapus foto '+(i+1)); x.textContent='×';
+    (function(k){x.onclick=function(e){e.stopPropagation();URL.revokeObjectURL(items[k].url);items.splice(k,1);render();};})(i);
+    d.appendChild(x);
+    var s=document.createElement('select'); s.setAttribute('aria-label','Bagian tanaman foto '+(i+1));
+    ORGANS.forEach(function(o){var op=document.createElement('option');op.textContent=o;if(o===it.organ)op.selected=true;s.appendChild(op);});
+    (function(k){s.onchange=function(){items[k].organ=this.value;};})(i);
+    d.appendChild(s);
+   } else { d.textContent='Foto '+(i+1); }
+   slots.appendChild(d);
+  }
+  count.textContent=items.length+' dari '+MAX+' foto';
+  go.disabled=items.length===0;
+  res.style.display='none';
+ }
+ function add(list){
+  Array.prototype.slice.call(list).forEach(function(f){
+   if(items.length>=MAX||!/^image\//.test(f.type))return;
+   items.push({file:f,url:URL.createObjectURL(f),organ:ORGANS[items.length%4]});
+  });
+  render();
+ }
+ drop.onclick=function(){file.click();};
+ drop.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();file.click();}};
+ file.onchange=function(){add(file.files);file.value='';};
+ ['dragenter','dragover'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('over');});});
+ ['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('over');});});
+ drop.addEventListener('drop',function(e){add(e.dataTransfer.files);});
+ document.getElementById('reset').onclick=function(){items.forEach(function(i){URL.revokeObjectURL(i.url);});items=[];render();};
+ function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+ go.onclick=async function(){
+  go.disabled=true; go.textContent='Menganalisis…';
+  try{
+   var fd=new FormData();
+   items.forEach(function(it){fd.append('images',it.file);fd.append('organs',it.organ);});
+   fd.append('project',flora.value);
+   var r=await fetch('/api/identify',{method:'POST',body:fd});
+   var data=await r.json().catch(function(){return {};});
+   if(!r.ok) throw new Error(data.error||'Identifikasi gagal.');
+   var list=data.results||[];
+   var h='<h3>Kemungkinan spesies</h3><div class="note">'+esc(flora.options[flora.selectedIndex].text)+' · '+items.length+' foto dianalisis</div>';
+   if(!list.length) h+='<p>Tidak ada spesies yang cocok. Coba foto yang lebih dekat dan terang.</p>';
+   list.forEach(function(x){
+    var cn=(x.commonNames||[]).slice(0,2).join(', ');
+    h+='<div class="r"><div><em>'+esc(x.name)+'</em></div><b>'+esc(x.score)+'%</b><small>'+esc(x.family)+(cn?' – '+esc(cn):'')+'</small><div class="bar"><i data-w="'+Number(x.score)+'"></i></div></div>';
+   });
+   res.innerHTML=h; res.style.display='block';
+   requestAnimationFrame(function(){requestAnimationFrame(function(){
+    res.querySelectorAll('.bar i').forEach(function(b){b.style.width=b.dataset.w+'%';});
+   });});
+  }catch(e){
+   res.innerHTML='<h3>Belum berhasil</h3><p>'+esc(e.message)+'</p>'; res.style.display='block';
+  }
+  go.textContent='Identifikasi tanaman'; go.disabled=items.length===0;
+ };
+ render();
+})();
+</script>
+</body>
+</html>
